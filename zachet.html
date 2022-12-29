@@ -1,0 +1,84 @@
+<HTML>
+  <BODY>
+  <canvas id="zachet">
+  </canvas>
+  <script>
+    var plot = function(x, y, c) {
+      if (isFinite(x) && isFinite(y)) {
+        var color = {
+          r: plot.color.r,
+          g: plot.color.g,
+          b: plot.color.b,
+          a: plot.color.a * c
+        };
+        setPixel(x, y, color);
+      }
+    };
+
+    function setPixel(x, y, c) {
+      c = c || 1;
+      var p = canvas.createImageData(1, 1);
+      p.data[0] = c.r;
+      p.data[1] = c.g;
+      p.data[2] = c.b;
+      p.data[3] = c.a;
+      var data = canvas.getImageData(x, y, 1, 1).data;
+      if (data[3] <= p.data[3]) canvas.putImageData(p, x, y);
+    }
+
+    function fill(x, y, color) {
+      var startColor = canvas.getImageData(x, y, 1, 1).data;
+      plot.color = color;
+      var q = [
+        [x, y]
+      ];
+      for (var i = 0; i != q.length; i++) {
+        var x = q[i][0],
+          y = q[i][1];
+        var data = canvas.getImageData(x, y, 1, 1).data;
+        if (x >= 0 && y >= 0 && x < canvasX && y < canvasY && data[0] == startColor[0] && data[1] == startColor[1] && data[2] == startColor[2] && data[3] == startColor[3]) {
+          plot(x, y, 1);
+          var s = q.length;
+          q[s] = [x + 1, y];
+          q[s + 1] = [x - 1, y];
+          q[s + 2] = [x, y + 1];
+          q[s + 3] = [x, y - 1];
+        }
+      }
+    }
+  </script>
+  <script>
+    var canvasElem = document.createElement('canvas');
+    canvasElem.id = "canvas";
+    canvasElem.width = 600;
+    canvasElem.height = 600;
+    xa = 125;
+    ya = 125;
+    xb = 125;
+    yb = 45;
+    xc = 45;
+    yc = 125;
+    document.body.appendChild(canvasElem);
+    canvas = canvasElem.getContext('2d');
+    canvasX = canvasElem.width;
+    canvasY = canvasElem.height;
+    canvasElem.strokeStyle = "black";
+    canvas.beginPath();
+    canvas.moveTo(xa, ya);
+    canvas.lineTo(xb, yb);
+    canvas.lineTo(xc, yc);
+    canvas.closePath();
+    canvas.stroke();
+
+    function start() {
+      fill(100, 100, {
+        r: 234,
+        g: 10,
+        b: 179,
+        a: 255
+      });
+    };
+    start();
+  </script>
+  </BODY>
+  </HTML>
